@@ -214,16 +214,25 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', padding='pre', truncati
 
     if maxlen is None:
         maxlen = max(len(x) for x in sequences)
+    # 这里 sequence 对应的是 dataframe 的一列数据
+    # len(sequence) 是 dataframe 的行数, maxlen 是 dataframe 该列中最长的长度值
     arr = np.full((len(sequences), maxlen), value, dtype=dtype)
     for idx, x in enumerate(sequences):
         if len(x) == 0:
             continue  # empty list
+        # truncating 决定了 x 取数据的方向，
+        # truncating 当输入 maxlen 小于实际 x 的 maxlen 的时候起作用
+        # eg : [1, 2, 3] , 输入 maxlen = 2
+        # pre  : trunc = [2, 3]
+        # post : trunc = [1, 2]
         if truncating == 'pre':
             trunc = x[-maxlen:]
         else:
             trunc = x[:maxlen]
         trunc = np.asarray(trunc, dtype=dtype)
 
+        # padding 决定了往 trunc 截取后的片段填充的位置
+        # 填充的方式是通过按切片填放到创建的等长 0 向量中
         if padding == 'pre':
             arr[idx, -len(trunc):] = trunc
         else:
